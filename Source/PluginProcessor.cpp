@@ -9,7 +9,7 @@
 */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "PluginUserInterface.h"
 
 
 //==============================================================================
