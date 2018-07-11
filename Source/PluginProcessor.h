@@ -57,6 +57,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    int writeIndex, readIndex, totalBufferLength;
+    ScopedPointer<float> circularBufferL, circularBufferR;
+    OwnedArray<float> bufferHolder;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SkeleChorusAudioProcessor)
 };

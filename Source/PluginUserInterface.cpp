@@ -84,7 +84,7 @@ SkeleChorusAudioProcessorEditor::SkeleChorusAudioProcessorEditor (SkeleChorusAud
 
     addAndMakeVisible (depthLabel = new Label ("depthLabel",
                                                TRANS("50%")));
-    depthLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular").withExtraKerningFactor (-0.070f));
+    depthLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     depthLabel->setJustificationType (Justification::centred);
     depthLabel->setEditable (false, false, false);
     depthLabel->setColour (TextEditor::textColourId, Colours::black);
@@ -398,7 +398,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="70 208 92 24" edTextCol="ff000000"
          edBkgCol="0" labelText="50%" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="-0.07000000000000000666" bold="0" italic="0" justification="36"/>
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
   <LABEL name="rateLabel" id="d3b54b5165739b87" memberName="rateLabel"
          virtualName="" explicitFocusOrder="0" pos="200 208 92 24" edTextCol="ff000000"
          edBkgCol="0" labelText="0.18 Hz" editableSingleClick="0" editableDoubleClick="0"

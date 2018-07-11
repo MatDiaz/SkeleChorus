@@ -13,7 +13,8 @@
 
 
 //==============================================================================
-SkeleChorusAudioProcessor::SkeleChorusAudioProcessor()
+SkeleChorusAudioProcessor::SkeleChorusAudioProcessor():
+writeIndex(0), readIndex(0), totalBufferLength(1)
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -25,6 +26,7 @@ SkeleChorusAudioProcessor::SkeleChorusAudioProcessor()
                        )
 #endif
 {
+    
 }
 
 SkeleChorusAudioProcessor::~SkeleChorusAudioProcessor()
@@ -96,8 +98,16 @@ void SkeleChorusAudioProcessor::changeProgramName (int index, const String& newN
 //==============================================================================
 void SkeleChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    totalBufferLength = sampleRate * 3;
+    
+    circularBufferL = new float[totalBufferLength];
+    circularBufferR = new float[totalBufferLength];
+    
+    bufferHolder.add(circularBufferR);
+    bufferHolder.add(circularBufferL);
+    
+    for (auto i = 0; i < 2; ++i)
+        memset(bufferHolder[i], 0, sizeof (float) * totalBufferLength);
 }
 
 void SkeleChorusAudioProcessor::releaseResources()
@@ -135,28 +145,26 @@ void SkeleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    for (int j = 0; j < totalNumInputChannels; ++j)
+    {
+        float* channelData = buffer.getWritePointer(j);
+        
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+        {
+            float previousValue = bufferHolder[j][writeIndex];
+            float newValue = channelData[i] + (previousValue * 0.5);
+            bufferHolder[j][writeIndex] = newValue;
+            
+            channelData[i] = previousValue;
+            
+            if (++writeIndex >= totalBufferLength)
+                writeIndex = 0;
+        }
+    }
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
 }
 
 //==============================================================================
