@@ -13,6 +13,8 @@
 
 
 //==============================================================================
+// En esta primera linea se inicializan todos los valores que hayan sido
+// declarados en el header de esta misma clase
 SkeleChorusAudioProcessor::SkeleChorusAudioProcessor():
 writeIndex(0), readIndex(0), totalBufferLength(1), timeValue(44100 * 5), mixLevel(1), feedbackLevel(0.5)
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -30,9 +32,13 @@ writeIndex(0), readIndex(0), totalBufferLength(1), timeValue(44100 * 5), mixLeve
 }
 
 SkeleChorusAudioProcessor::~SkeleChorusAudioProcessor()
-{
+{   
+    // En el destructor eliminamos los posibles vectores
+    // que hayamos creados en punteros
     circularBufferL = nullptr;
     circularBufferR = nullptr;
+    // Y muy importante en el arreglo de vectores se deben
+    // eliminar los datos que hayamos incluido
     bufferHolder.clearQuick(false);
 }
 
@@ -100,20 +106,28 @@ void SkeleChorusAudioProcessor::changeProgramName (int index, const String& newN
 
 //==============================================================================
 void SkeleChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
-{
+{   
+    // Obtenemos la frecuencia de muestreo
     currentSampleRate = sampleRate;
+    // Inicializamos el valor maximo en el punto de la frecuencia de muestreo
     timeValue = currentSampleRate * 5;
     
-    if (circularBufferL == nullptr)
-    {
+    // Si aun no hemos asignado un tamaño a los buffer circulares que creamos
+    // entonces entramos en esta condicion
+    if (circularBufferL == nullptr || circularBufferR == nullptr)
+    {   
+        // asignamos el tamaño de los buffer
         totalBufferLength = sampleRate * 5;
         
+        // le asignamos un tamaño a los punteros previamente creados
         circularBufferL = new float[totalBufferLength];
         circularBufferR = new float[totalBufferLength];
         
+        // agregamos los dos vectores al arreglo (esto es como una especie de ""matriz"")
         bufferHolder.add(circularBufferR);
         bufferHolder.add(circularBufferL);
         
+        // llenamos de ceros ambos buffer
         for (auto i = 0; i < 2; ++i)
         {
             vectIndex[i] = 0;
@@ -158,26 +172,33 @@ void SkeleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
+    // Si hay mas salidas que entradas
+    // Si hay mas de dos salidas/entradas (por configuración nuestra)
+    // limpiamos los buffer de salida (no suena nada)
     if (totalNumOutputChannels > totalNumInputChannels || totalNumOutputChannels > 2 || totalNumInputChannels > 2)
     {
         for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
             buffer.clear (i, 0, buffer.getNumSamples());
     }
-    
-    for (auto j = 0; j < totalNumInputChannels; ++j)
+    else // Si no entonces hacemos el ciclo
     {
-        float* channelData = buffer.getWritePointer(j);
-        
-        for (auto i = 0; i < buffer.getNumSamples(); ++i)
+        for (auto j = 0; j < totalNumInputChannels; ++j) // Recorremos cada uno de los canales
         {
-            float previousValue = bufferHolder[j][vectIndex[j]];
-            float newValue = channelData[i] + (previousValue * feedbackLevel);
-            bufferHolder[j][vectIndex[j]] = newValue;
-            
-            channelData[i] = (channelData[i] * (mixLevel - 1)) + (previousValue * mixLevel);
-            
-            if (++vectIndex[j] >= timeValue)
-                vectIndex[j] = 0;
+            float* channelData = buffer.getWritePointer(j); // Obtenemos el puntero de escritura
+        
+            for (auto i = 0; i < buffer.getNumSamples(); ++i) // modificamos cada una de las muestras
+            {
+                float previousValue = bufferHolder[j][vectIndex[j]]; // Obtenemos el valor anterior ( de cada canal y cada muestra )
+                float newValue = channelData[i] + (previousValue * feedbackLevel); // lo multiplicamos por el valor de feedback y le sumamos la muestra que entra
+                bufferHolder[j][vectIndex[j]] = newValue; // Se guarda en la misma posicion del buffer circular
+                
+                // La salida sera: la misma entrada, mas el valor que extrajimmos del buffer circular
+                channelData[i] = (channelData[i] * (mixLevel - 1)) + (previousValue * mixLevel);
+                
+                // Aumentamos la posicion del buffer circular
+                if (++vectIndex[j] >= timeValue)
+                    vectIndex[j] = 0;
+            }
         }
     }
 }

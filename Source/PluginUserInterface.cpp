@@ -208,12 +208,16 @@ void SkeleChorusAudioProcessorEditor::resized()
 void SkeleChorusAudioProcessorEditor::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
+        // Obtenemos el valor que se haya modificado en el slider
+        // independiente del que se haya movido
 	float enteringValue = sliderThatWasMoved->getValue();
     //[/UsersliderValueChanged_Pre]
 
     if (sliderThatWasMoved == rateSlider)
     {
         //[UserSliderCode_rateSlider] -- add your slider handling code here..
+            // Si se modifico el slider de tiempo, se divide entre 1000
+            // (de milisegundos a segundos) y se multiplica por la frecuencia de muestreo
         processor.timeValue = ((enteringValue)/1000) * processor.currentSampleRate;
 		String newValue(enteringValue, 2);
         timeLabel->setText(newValue + " mSec", dontSendNotification);
@@ -222,6 +226,9 @@ void SkeleChorusAudioProcessorEditor::sliderValueChanged (Slider* sliderThatWasM
     else if (sliderThatWasMoved == feedBackSlider)
     {
         //[UserSliderCode_feedBackSlider] -- add your slider handling code here..
+            // Si se modifica la cantidad de feedback se asigna a la variable
+            // creada en el processor
+            // luego para mostrarla se multiplica por 100 y se ubica en el GUI
         processor.feedbackLevel = enteringValue;
 		String newValue(enteringValue * 100, 2);
 		feedbackLabel->setText(newValue + " %", dontSendNotification);
@@ -230,6 +237,8 @@ void SkeleChorusAudioProcessorEditor::sliderValueChanged (Slider* sliderThatWasM
     else if (sliderThatWasMoved == chorusOffsetSlider)
     {
         //[UserSliderCode_chorusOffsetSlider] -- add your slider handling code here..
+            // Aca se realiza el mismo proceso que se realizo para el feedback
+            // solo que se asigna a una variable diferente en el processor
         processor.mixLevel = enteringValue;
 		String newValue(enteringValue * 100, 2);
 		mixLabel->setText(newValue + " %", dontSendNotification);
