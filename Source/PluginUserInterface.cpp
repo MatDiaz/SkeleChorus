@@ -34,73 +34,45 @@ SkeleChorusAudioProcessorEditor::SkeleChorusAudioProcessorEditor (SkeleChorusAud
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (depthSlider = new Slider ("depthSlider"));
-    depthSlider->setRange (0, 1, 0);
-    depthSlider->setSliderStyle (Slider::Rotary);
-    depthSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    depthSlider->setColour (Slider::rotarySliderFillColourId, Colours::white);
-    depthSlider->addListener (this);
-
-    depthSlider->setBounds (72, 136, 88, 80);
-
     addAndMakeVisible (rateSlider = new Slider ("rateSlider"));
-    rateSlider->setRange (0.02, 5, 0);
+    rateSlider->setRange (10, 5000, 0);
     rateSlider->setSliderStyle (Slider::Rotary);
     rateSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    rateSlider->setColour (Slider::thumbColourId, Colour (0xff21a2ba));
     rateSlider->setColour (Slider::rotarySliderFillColourId, Colours::white);
     rateSlider->addListener (this);
 
-    rateSlider->setBounds (200, 136, 88, 80);
+    rateSlider->setBounds (144, 104, 88, 80);
 
     addAndMakeVisible (feedBackSlider = new Slider ("feedBackSlider"));
-    feedBackSlider->setRange (-1, 1, 0);
+    feedBackSlider->setRange (0, 1, 0);
     feedBackSlider->setSliderStyle (Slider::Rotary);
     feedBackSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    feedBackSlider->setColour (Slider::thumbColourId, Colour (0xff397fad));
     feedBackSlider->setColour (Slider::rotarySliderFillColourId, Colours::white);
     feedBackSlider->addListener (this);
 
-    feedBackSlider->setBounds (320, 136, 88, 80);
+    feedBackSlider->setBounds (264, 104, 88, 80);
 
     addAndMakeVisible (chorusOffsetSlider = new Slider ("chorusOffsetSlider"));
-    chorusOffsetSlider->setRange (0, 10, 0);
+    chorusOffsetSlider->setRange (0, 1, 0);
     chorusOffsetSlider->setSliderStyle (Slider::Rotary);
     chorusOffsetSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    chorusOffsetSlider->setColour (Slider::thumbColourId, Colour (0xff2159ba));
     chorusOffsetSlider->setColour (Slider::rotarySliderFillColourId, Colours::white);
     chorusOffsetSlider->addListener (this);
 
-    chorusOffsetSlider->setBounds (440, 136, 88, 80);
+    chorusOffsetSlider->setBounds (384, 104, 88, 80);
 
-    addAndMakeVisible (modTypeList = new ComboBox ("modTypeList"));
-    modTypeList->setEditableText (false);
-    modTypeList->setJustificationType (Justification::centredLeft);
-    modTypeList->setTextWhenNothingSelected (String());
-    modTypeList->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    modTypeList->addItem (TRANS("Flanger,"), 1);
-    modTypeList->addItem (TRANS("Vibrato,"), 2);
-    modTypeList->addItem (TRANS("Chorus"), 3);
-    modTypeList->addListener (this);
+    addAndMakeVisible (timeLabel = new Label ("timeLabel",
+                                              TRANS("10 mSec")));
+    timeLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    timeLabel->setJustificationType (Justification::centred);
+    timeLabel->setEditable (false, false, false);
+    timeLabel->setColour (TextEditor::textColourId, Colours::black);
+    timeLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    modTypeList->setBounds (275, 80, 150, 16);
-
-    addAndMakeVisible (depthLabel = new Label ("depthLabel",
-                                               TRANS("50%")));
-    depthLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    depthLabel->setJustificationType (Justification::centred);
-    depthLabel->setEditable (false, false, false);
-    depthLabel->setColour (TextEditor::textColourId, Colours::black);
-    depthLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    depthLabel->setBounds (70, 208, 92, 24);
-
-    addAndMakeVisible (rateLabel = new Label ("rateLabel",
-                                              TRANS("0.18 Hz")));
-    rateLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    rateLabel->setJustificationType (Justification::centred);
-    rateLabel->setEditable (false, false, false);
-    rateLabel->setColour (TextEditor::textColourId, Colours::black);
-    rateLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    rateLabel->setBounds (200, 208, 92, 24);
+    timeLabel->setBounds (141, 176, 92, 24);
 
     addAndMakeVisible (feedbackLabel = new Label ("feedbackLabel",
                                                   TRANS("0 %")));
@@ -110,17 +82,17 @@ SkeleChorusAudioProcessorEditor::SkeleChorusAudioProcessorEditor (SkeleChorusAud
     feedbackLabel->setColour (TextEditor::textColourId, Colours::black);
     feedbackLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    feedbackLabel->setBounds (320, 208, 92, 24);
+    feedbackLabel->setBounds (261, 176, 92, 24);
 
-    addAndMakeVisible (offsetLabel = new Label ("offsetLabel",
-                                                TRANS("0 mSec")));
-    offsetLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    offsetLabel->setJustificationType (Justification::centred);
-    offsetLabel->setEditable (false, false, false);
-    offsetLabel->setColour (TextEditor::textColourId, Colours::black);
-    offsetLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    addAndMakeVisible (mixLabel = new Label ("mixLabel",
+                                             TRANS("0 %")));
+    mixLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    mixLabel->setJustificationType (Justification::centred);
+    mixLabel->setEditable (false, false, false);
+    mixLabel->setColour (TextEditor::textColourId, Colours::black);
+    mixLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    offsetLabel->setBounds (440, 208, 92, 24);
+    mixLabel->setBounds (383, 176, 92, 24);
 
 
     //[UserPreSize]
@@ -139,15 +111,12 @@ SkeleChorusAudioProcessorEditor::~SkeleChorusAudioProcessorEditor()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    depthSlider = nullptr;
     rateSlider = nullptr;
     feedBackSlider = nullptr;
     chorusOffsetSlider = nullptr;
-    modTypeList = nullptr;
-    depthLabel = nullptr;
-    rateLabel = nullptr;
+    timeLabel = nullptr;
     feedbackLabel = nullptr;
-    offsetLabel = nullptr;
+    mixLabel = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -176,20 +145,8 @@ void SkeleChorusAudioProcessorEditor::paint (Graphics& g)
     }
 
     {
-        float x = 150.0f, y = 71.0f, width = 288.0f, height = 32.0f;
-        Colour fillColour = Colour (0x672a85a5);
-        Colour strokeColour = Colours::white;
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (fillColour);
-        g.fillRoundedRectangle (x, y, width, height, 10.000f);
-        g.setColour (strokeColour);
-        g.drawRoundedRectangle (x, y, width, height, 10.000f, 0.500f);
-    }
-
-    {
-        int x = 175, y = 15, width = 240, height = 40;
-        String text (TRANS("SkeleChorus"));
+        int x = 156, y = 19, width = 297, height = 40;
+        String text (TRANS("Delay-yay"));
         Colour fillColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
         //[/UserPaintCustomArguments]
@@ -200,20 +157,8 @@ void SkeleChorusAudioProcessorEditor::paint (Graphics& g)
     }
 
     {
-        int x = 150, y = 65, width = 70, height = 40;
-        String text (TRANS("Mode"));
-        Colour fillColour = Colours::white;
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (fillColour);
-        g.setFont (Font (Font::getDefaultSansSerifFontName(), 18.00f, Font::plain).withTypefaceStyle ("Regular"));
-        g.drawText (text, x, y, width, height,
-                    Justification::centred, true);
-    }
-
-    {
-        int x = 85, y = 115, width = 64, height = 25;
-        String text (TRANS("Depth"));
+        int x = 154, y = 83, width = 64, height = 25;
+        String text (TRANS("Time"));
         Colour fillColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
         //[/UserPaintCustomArguments]
@@ -224,19 +169,7 @@ void SkeleChorusAudioProcessorEditor::paint (Graphics& g)
     }
 
     {
-        int x = 210, y = 115, width = 64, height = 25;
-        String text (TRANS("Rate"));
-        Colour fillColour = Colours::white;
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (fillColour);
-        g.setFont (Font (Font::getDefaultSansSerifFontName(), 15.00f, Font::plain).withTypefaceStyle ("Regular"));
-        g.drawText (text, x, y, width, height,
-                    Justification::centred, true);
-    }
-
-    {
-        int x = 325, y = 115, width = 78, height = 25;
+        int x = 269, y = 83, width = 78, height = 25;
         String text (TRANS("Feedback"));
         Colour fillColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
@@ -248,8 +181,8 @@ void SkeleChorusAudioProcessorEditor::paint (Graphics& g)
     }
 
     {
-        int x = 445, y = 115, width = 78, height = 25;
-        String text (TRANS("Offset"));
+        int x = 389, y = 83, width = 78, height = 25;
+        String text (TRANS("Mix"));
         Colour fillColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
         //[/UserPaintCustomArguments]
@@ -278,23 +211,18 @@ void SkeleChorusAudioProcessorEditor::sliderValueChanged (Slider* sliderThatWasM
 	float enteringValue = sliderThatWasMoved->getValue();
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == depthSlider)
-    {
-        //[UserSliderCode_depthSlider] -- add your slider handling code here..
-		String newValue(enteringValue * 100, 2);
-		depthLabel->setText(newValue + " %", dontSendNotification);
-        //[/UserSliderCode_depthSlider]
-    }
-    else if (sliderThatWasMoved == rateSlider)
+    if (sliderThatWasMoved == rateSlider)
     {
         //[UserSliderCode_rateSlider] -- add your slider handling code here..
+        processor.timeValue = ((enteringValue)/1000) * processor.currentSampleRate;
 		String newValue(enteringValue, 2);
-		rateLabel->setText(newValue + " Hz", dontSendNotification);
+        timeLabel->setText(newValue + " mSec", dontSendNotification);
         //[/UserSliderCode_rateSlider]
     }
     else if (sliderThatWasMoved == feedBackSlider)
     {
         //[UserSliderCode_feedBackSlider] -- add your slider handling code here..
+        processor.feedbackLevel = enteringValue;
 		String newValue(enteringValue * 100, 2);
 		feedbackLabel->setText(newValue + " %", dontSendNotification);
         //[/UserSliderCode_feedBackSlider]
@@ -302,28 +230,14 @@ void SkeleChorusAudioProcessorEditor::sliderValueChanged (Slider* sliderThatWasM
     else if (sliderThatWasMoved == chorusOffsetSlider)
     {
         //[UserSliderCode_chorusOffsetSlider] -- add your slider handling code here..
-		String newValue(enteringValue, 2);
-		offsetLabel->setText(newValue + " mSec", dontSendNotification);
+        processor.mixLevel = enteringValue;
+		String newValue(enteringValue * 100, 2);
+		mixLabel->setText(newValue + " %", dontSendNotification);
         //[/UserSliderCode_chorusOffsetSlider]
     }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
-}
-
-void SkeleChorusAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == modTypeList)
-    {
-        //[UserComboBoxCode_modTypeList] -- add your combo box handling code here..
-        //[/UserComboBoxCode_modTypeList]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 
@@ -349,69 +263,50 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff000000">
     <RECT pos="8 8 585 235" fill="solid: 2a3a3a4e" hasStroke="1" stroke="5, mitered, butt"
           strokeColour="solid: ff3673a7"/>
-    <ROUNDRECT pos="150 71 288 32" cornerSize="10.00000000000000000000" fill="solid: 672a85a5"
-               hasStroke="1" stroke="0.5, mitered, butt" strokeColour="solid: ffffffff"/>
-    <TEXT pos="175 15 240 40" fill="solid: ffffffff" hasStroke="0" text="SkeleChorus"
+    <TEXT pos="156 19 297 40" fill="solid: ffffffff" hasStroke="0" text="Delay-yay"
           fontname="Default sans-serif font" fontsize="43.50000000000000000000"
           kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-    <TEXT pos="150 65 70 40" fill="solid: ffffffff" hasStroke="0" text="Mode"
-          fontname="Default sans-serif font" fontsize="18.00000000000000000000"
-          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-    <TEXT pos="85 115 64 25" fill="solid: ffffffff" hasStroke="0" text="Depth"
+    <TEXT pos="154 83 64 25" fill="solid: ffffffff" hasStroke="0" text="Time"
           fontname="Default sans-serif font" fontsize="15.00000000000000000000"
           kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-    <TEXT pos="210 115 64 25" fill="solid: ffffffff" hasStroke="0" text="Rate"
+    <TEXT pos="269 83 78 25" fill="solid: ffffffff" hasStroke="0" text="Feedback"
           fontname="Default sans-serif font" fontsize="15.00000000000000000000"
           kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-    <TEXT pos="325 115 78 25" fill="solid: ffffffff" hasStroke="0" text="Feedback"
-          fontname="Default sans-serif font" fontsize="15.00000000000000000000"
-          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-    <TEXT pos="445 115 78 25" fill="solid: ffffffff" hasStroke="0" text="Offset"
+    <TEXT pos="389 83 78 25" fill="solid: ffffffff" hasStroke="0" text="Mix"
           fontname="Default sans-serif font" fontsize="15.00000000000000000000"
           kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
   </BACKGROUND>
-  <SLIDER name="depthSlider" id="c968fe14a38154c3" memberName="depthSlider"
-          virtualName="" explicitFocusOrder="0" pos="72 136 88 80" rotarysliderfill="ffffffff"
-          min="0.00000000000000000000" max="1.00000000000000000000" int="0.00000000000000000000"
-          style="Rotary" textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
   <SLIDER name="rateSlider" id="687bad69a5bfa144" memberName="rateSlider"
-          virtualName="" explicitFocusOrder="0" pos="200 136 88 80" rotarysliderfill="ffffffff"
-          min="0.02000000000000000042" max="5.00000000000000000000" int="0.00000000000000000000"
-          style="Rotary" textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="144 104 88 80" thumbcol="ff21a2ba"
+          rotarysliderfill="ffffffff" min="10.00000000000000000000" max="5000.00000000000000000000"
+          int="0.00000000000000000000" style="Rotary" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.00000000000000000000"
+          needsCallback="1"/>
   <SLIDER name="feedBackSlider" id="3c56cb0279a5241e" memberName="feedBackSlider"
-          virtualName="" explicitFocusOrder="0" pos="320 136 88 80" rotarysliderfill="ffffffff"
-          min="-1.00000000000000000000" max="1.00000000000000000000" int="0.00000000000000000000"
-          style="Rotary" textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="264 104 88 80" thumbcol="ff397fad"
+          rotarysliderfill="ffffffff" min="0.00000000000000000000" max="1.00000000000000000000"
+          int="0.00000000000000000000" style="Rotary" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.00000000000000000000"
+          needsCallback="1"/>
   <SLIDER name="chorusOffsetSlider" id="a6ed186501621b7b" memberName="chorusOffsetSlider"
-          virtualName="" explicitFocusOrder="0" pos="440 136 88 80" rotarysliderfill="ffffffff"
-          min="0.00000000000000000000" max="10.00000000000000000000" int="0.00000000000000000000"
-          style="Rotary" textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
-  <COMBOBOX name="modTypeList" id="1b03d8eb77b94dd9" memberName="modTypeList"
-            virtualName="" explicitFocusOrder="0" pos="275 80 150 16" editable="0"
-            layout="33" items="Flanger,&#10;Vibrato,&#10;Chorus" textWhenNonSelected=""
-            textWhenNoItems="(no choices)"/>
-  <LABEL name="depthLabel" id="81db525d18a5037e" memberName="depthLabel"
-         virtualName="" explicitFocusOrder="0" pos="70 208 92 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="50%" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-  <LABEL name="rateLabel" id="d3b54b5165739b87" memberName="rateLabel"
-         virtualName="" explicitFocusOrder="0" pos="200 208 92 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="0.18 Hz" editableSingleClick="0" editableDoubleClick="0"
+          virtualName="" explicitFocusOrder="0" pos="384 104 88 80" thumbcol="ff2159ba"
+          rotarysliderfill="ffffffff" min="0.00000000000000000000" max="1.00000000000000000000"
+          int="0.00000000000000000000" style="Rotary" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.00000000000000000000"
+          needsCallback="1"/>
+  <LABEL name="timeLabel" id="d3b54b5165739b87" memberName="timeLabel"
+         virtualName="" explicitFocusOrder="0" pos="141 176 92 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="10 mSec" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
   <LABEL name="feedbackLabel" id="59e51d4415043708" memberName="feedbackLabel"
-         virtualName="" explicitFocusOrder="0" pos="320 208 92 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="261 176 92 24" edTextCol="ff000000"
          edBkgCol="0" labelText="0 %" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-  <LABEL name="offsetLabel" id="2f8b3721a5e11baf" memberName="offsetLabel"
-         virtualName="" explicitFocusOrder="0" pos="440 208 92 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="0 mSec" editableSingleClick="0" editableDoubleClick="0"
+  <LABEL name="mixLabel" id="2f8b3721a5e11baf" memberName="mixLabel" virtualName=""
+         explicitFocusOrder="0" pos="383 176 92 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="0 %" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>

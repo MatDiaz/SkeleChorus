@@ -34,8 +34,7 @@
                                                                     //[/Comments]
 */
 class SkeleChorusAudioProcessorEditor  : public AudioProcessorEditor,
-                                         public Slider::Listener,
-                                         public ComboBox::Listener
+                                         public Slider::Listener
 {
 public:
     //==============================================================================
@@ -49,7 +48,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -59,15 +57,12 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Slider> depthSlider;
     ScopedPointer<Slider> rateSlider;
     ScopedPointer<Slider> feedBackSlider;
     ScopedPointer<Slider> chorusOffsetSlider;
-    ScopedPointer<ComboBox> modTypeList;
-    ScopedPointer<Label> depthLabel;
-    ScopedPointer<Label> rateLabel;
+    ScopedPointer<Label> timeLabel;
     ScopedPointer<Label> feedbackLabel;
-    ScopedPointer<Label> offsetLabel;
+    ScopedPointer<Label> mixLabel;
 
 
     //==============================================================================

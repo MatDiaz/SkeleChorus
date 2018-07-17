@@ -14,7 +14,7 @@
 
 //==============================================================================
 SkeleChorusAudioProcessor::SkeleChorusAudioProcessor():
-writeIndex(0), readIndex(0), totalBufferLength(1)
+writeIndex(0), readIndex(0), totalBufferLength(1), timeValue(44100 * 5), mixLevel(1), feedbackLevel(0.5)
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -31,6 +31,9 @@ writeIndex(0), readIndex(0), totalBufferLength(1)
 
 SkeleChorusAudioProcessor::~SkeleChorusAudioProcessor()
 {
+    circularBufferL = nullptr;
+    circularBufferR = nullptr;
+    bufferHolder.clearQuick(false);
 }
 
 //==============================================================================
@@ -98,16 +101,25 @@ void SkeleChorusAudioProcessor::changeProgramName (int index, const String& newN
 //==============================================================================
 void SkeleChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    totalBufferLength = sampleRate * 3;
+    currentSampleRate = sampleRate;
+    timeValue = currentSampleRate * 5;
     
-    circularBufferL = new float[totalBufferLength];
-    circularBufferR = new float[totalBufferLength];
-    
-    bufferHolder.add(circularBufferR);
-    bufferHolder.add(circularBufferL);
-    
-    for (auto i = 0; i < 2; ++i)
-        memset(bufferHolder[i], 0, sizeof (float) * totalBufferLength);
+    if (circularBufferL == nullptr)
+    {
+        totalBufferLength = sampleRate * 5;
+        
+        circularBufferL = new float[totalBufferLength];
+        circularBufferR = new float[totalBufferLength];
+        
+        bufferHolder.add(circularBufferR);
+        bufferHolder.add(circularBufferL);
+        
+        for (auto i = 0; i < 2; ++i)
+        {
+            vectIndex[i] = 0;
+            memset(bufferHolder[i], 0, sizeof (float) * totalBufferLength);
+        }
+    }
 }
 
 void SkeleChorusAudioProcessor::releaseResources()
@@ -146,25 +158,28 @@ void SkeleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    for (int j = 0; j < totalNumInputChannels; ++j)
+    if (totalNumOutputChannels > totalNumInputChannels || totalNumOutputChannels > 2 || totalNumInputChannels > 2)
+    {
+        for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+            buffer.clear (i, 0, buffer.getNumSamples());
+    }
+    
+    for (auto j = 0; j < totalNumInputChannels; ++j)
     {
         float* channelData = buffer.getWritePointer(j);
         
-        for (int i = 0; i < buffer.getNumSamples(); ++i)
+        for (auto i = 0; i < buffer.getNumSamples(); ++i)
         {
-            float previousValue = bufferHolder[j][writeIndex];
-            float newValue = channelData[i] + (previousValue * 0.5);
-            bufferHolder[j][writeIndex] = newValue;
+            float previousValue = bufferHolder[j][vectIndex[j]];
+            float newValue = channelData[i] + (previousValue * feedbackLevel);
+            bufferHolder[j][vectIndex[j]] = newValue;
             
-            channelData[i] = previousValue;
+            channelData[i] = (channelData[i] * (mixLevel - 1)) + (previousValue * mixLevel);
             
-            if (++writeIndex >= totalBufferLength)
-                writeIndex = 0;
+            if (++vectIndex[j] >= timeValue)
+                vectIndex[j] = 0;
         }
     }
-
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
 }
 
 //==============================================================================

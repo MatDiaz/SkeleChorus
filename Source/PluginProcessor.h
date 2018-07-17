@@ -55,11 +55,14 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    float timeValue, mixLevel, feedbackLevel, currentSampleRate;
 
 private:
     int writeIndex, readIndex, totalBufferLength;
     ScopedPointer<float> circularBufferL, circularBufferR;
     OwnedArray<float> bufferHolder;
+    int vectIndex[2];
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SkeleChorusAudioProcessor)
 };
